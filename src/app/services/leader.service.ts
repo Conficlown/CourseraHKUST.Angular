@@ -7,12 +7,20 @@ import { Leader } from '../shared/leader';
 })
 export class LeaderService {
 
-  getLeaders(): Leader[] {
-    return LEADERS;
+  getLeaders(): Promise<Leader[]> {
+    // return LEADERS;
+    return new Promise(resolve=> {
+      // Simulate server latency with 2 second delay
+        setTimeout(() => resolve(LEADERS), 2000);
+    });
   }
 
-  getFeaturedLeader(): Leader {
-    return LEADERS.filter((leader) => leader.featured)[0];
+  getFeaturedLeader(): Promise<Leader> {
+    // return LEADERS.filter((leader) => leader.featured)[0];
+    return  new Promise(resolve=> {
+      // Simulate server latency with 2 second delay
+        setTimeout(() => resolve(LEADERS.filter((Leader) => Leader.featured)[0]), 2000);
+    });
   }
 
   constructor() { }
