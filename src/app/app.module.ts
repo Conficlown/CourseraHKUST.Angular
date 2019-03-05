@@ -31,6 +31,7 @@ import { LoginComponent } from './login/login.component';
 
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import {MatSliderModule} from '@angular/material/slider';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
@@ -57,6 +58,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatCheckboxModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatSliderModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatToolbarModule,

@@ -1,54 +1,14 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { Dish } from '../shared/dish';
 
 import { DishService } from '../services/dish.service';
+import { Comment } from '../shared/comment';
 import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { switchMap } from 'rxjs/operators';
-// const DISH = {
-//   id: '0',
-//   name: 'Uthappizza',
-//   image: '/assets/images/uthappizza.png',
-//   category: 'mains',
-//   featured: true,
-//   label: 'Hot',
-//   price: '4.99',
-//   // tslint:disable-next-line:max-line-length
-//   description: 'A unique combination of Indian Uthappam (pancake) and Italian pizza, topped with Cerignola olives, ripe vine cherry tomatoes, Vidalia onion, Guntur chillies and Buffalo Paneer.',
-//   comments: [
-//        {
-//            rating: 5,
-//            comment: 'Imagine all the eatables, living in conFusion!',
-//            author: 'John Lemon',
-//            date: '2012-10-16T17:57:28.556094Z'
-//        },
-//        {
-//            rating: 4,
-//            comment: 'Sends anyone to heaven, I wish I could get my mother-in-law to eat it!',
-//            author: 'Paul McVites',
-//            date: '2014-09-05T17:57:28.556094Z'
-//        },
-//        {
-//            rating: 3,
-//            comment: 'Eat it, just eat it!',
-//            author: 'Michael Jaikishan',
-//            date: '2015-02-13T17:57:28.556094Z'
-//        },
-//        {
-//            rating: 4,
-//            comment: 'Ultimate, Reaching for the stars!',
-//            author: 'Ringo Starry',
-//            date: '2013-12-02T17:57:28.556094Z'
-//        },
-//        {
-//            rating: 2,
-//            comment: 'It\'s your birthday, we\'re gonna party!',
-//            author: '25 Cent',
-//            date: '2011-12-02T17:57:28.556094Z'
-//        }
-//    ]
-// };
 
 @Component({
   selector: 'app-dishdetail',
@@ -57,6 +17,8 @@ import { switchMap } from 'rxjs/operators';
 })
 export class DishdetailComponent implements OnInit {
 
+  @ViewChild('fform') rateCommentFormDirective;
+
   @Input()
   dish: Dish;
 
@@ -64,11 +26,39 @@ export class DishdetailComponent implements OnInit {
   prev: string;
   next: string;
 
+  //add new rating comment to dish
+  rateCommentForm: FormGroup;
+  rateComment: Comment;
+
+  formErrors = {
+    'author': '',
+    'comment': '',
+    'rating': 5
+  };
+
+  validationMessages = {
+    'author': {
+      'required':      'Name is required.',
+      'minlength':     'Name must be at least 2 characters long.',
+      'maxlength':     'Name cannot be more than 25 characters long.'
+    },
+    'rating': {
+      'required':      'Rating is required.',
+    },
+    'comment': {
+      'required':      'Comment is required if rating is lower than 5 stars.',
+      'maxlength':     'Comment cannot be more than 255 characters long.'
+    }
+  };
+
   // dish = DISH;
 
   constructor(private dishservice: DishService,
     private route: ActivatedRoute,
-    private location: Location) { }
+    private location: Location,
+    private fb: FormBuilder) {
+        this.createForm(); 
+     }
 
   ngOnInit() {
     let id = this.route.snapshot.params['id'];
@@ -79,6 +69,8 @@ export class DishdetailComponent implements OnInit {
     this.route.params
     .pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
     .subscribe( dish => { this.dish = dish; this.setPrevNext(dish.id);});
+    // this.ratingSetCommentRequired();
+    // this.onValueChanged(); // (re)set validation messages now
   }
 
   setPrevNext(dishId: string) {
@@ -89,5 +81,87 @@ export class DishdetailComponent implements OnInit {
 
   goBack(): void {
     this.location.back();
+  }
+
+  //rateCommentForm
+  createForm(): void {
+    this.rateCommentForm = this.fb.group({
+      author: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(25)] ],
+      rating: [5, [Validators.required] ],
+      comment: ['', [ Validators.maxLength(255)] ]
+    });
+
+    this.rateCommentForm.valueChanges
+    .subscribe(data => this.onValueChanged(data));
+    // this.ratingSetCommentRequired();
+    this.onValueChanged(); // (re)set validation messages now
+    // this.onValueChanged(); // (re)set validation messages now
+  }
+
+  getToday () {
+    let today = new Date();
+    return today.toISOString();
+  }
+
+  onSubmit() {
+    this.rateComment = this.rateCommentForm.value;
+    this.rateComment['date'] = this.getToday();
+    this.dish.comments.push(this.rateComment);
+    // console.log(this.rateComment);
+    this.rateCommentForm.reset({
+      rating: 5,
+      comment: '',
+      author: ''
+    });
+    
+    // console.log(today.);
+    console.log(this.dish.comments);
+    // this.rateComment.reset();
+    // this.rateComment['author'] = '';
+    // this.rateComment['comment'] = '';
+    // this.rateComment['date'] = '';
+    // this.rateComment['rating'] = 0;
+    this.rateCommentFormDirective.resetForm();
+
+  }
+
+  onValueChanged(data?: any) {
+    if (!this.rateCommentForm) { return; }
+    const form = this.rateCommentForm;
+    const CommentTxtCtrl = this.rateCommentForm.get('comment');
+    this.rateCommentForm.get('rating').valueChanges
+      .subscribe(rating => {
+        if (rating < 5) {
+          CommentTxtCtrl.setValidators([Validators.maxLength(255), Validators.required]);
+        }else {
+          CommentTxtCtrl.setValidators([ Validators.maxLength(255) ]);
+        }
+
+        CommentTxtCtrl.updateValueAndValidity();
+      })
+
+    for (const field in this.formErrors) {
+      if (this.formErrors.hasOwnProperty(field)) {
+        // clear previous error message (if any)
+        this.formErrors[field] = '';
+        const control = form.get(field);
+        // console.log(control);
+        // if (control && control.dirty && !control.valid) {
+          // console.log(field);
+        let condition = control && control.dirty && !control.valid;
+        // if ( field === 'comment' ){
+        //   // console.log(field);
+        //   condition = control && control.untouched && !control.valid;
+        // }
+        if (condition) {
+          const messages = this.validationMessages[field];
+          for (const key in control.errors) {
+            if (control.errors.hasOwnProperty(key)) {
+              this.formErrors[field] += messages[key] + ' ';
+            }
+          }
+        }
+      }
+    }
   }
 }

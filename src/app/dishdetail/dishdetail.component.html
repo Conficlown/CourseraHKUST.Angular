@@ -43,6 +43,40 @@
           </mat-list-item>
         </mat-list>
     </div>
+    <div fxFlex="40">
+      <!-- <p>Display the list of comments here</p> -->
+      <h2>Leave a new comment</h2>
+      <mat-list>
+          <mat-list-item *ngIf="rateCommentForm.valid"> 
+            <p matLine>{{rateCommentForm.value.comment}}</p>
+            <p matLine>{{rateCommentForm.value.rating}} Stars</p>
+            <p matLine>--{{rateCommentForm.value.author}}</p>
+          </mat-list-item>
+        </mat-list>
+      <form novalidate [formGroup]="rateCommentForm" #fform="ngForm" (ngSubmit)="onSubmit()">
+          <p>
+            <mat-form-field class="half-width">
+              <input matInput formControlName="author" placeholder="Name" type="text" required>
+              <!-- <mat-error *ngIf="feedbackForm.get('firstname').hasError('required') && feedbackForm.get('firstname').touched">First name is required</mat-error> -->
+              <mat-error *ngIf="formErrors.author">{{formErrors.author}}</mat-error>
+            </mat-form-field>
+          </p>
+          <p>
+            <mat-slider min="0" max="5" step="1" thumbLabel tickInterval="1" formControlName="rating">
+
+            </mat-slider>
+          </p>
+          <p>
+            <mat-form-field class="full-width">
+              <textarea matInput formControlName="comment" placeholder="Your Comment" rows=12 type="text"></textarea>
+              <mat-error *ngIf="formErrors.comment">{{formErrors.comment}}</mat-error>
+            </mat-form-field>
+          </p>
+          <button type="submit" [disabled]="!rateCommentForm.valid" mat-button class="background-primary text-floral-white">Submit</button>
+          <p>{{rateCommentForm.value | json}}</p>
+          <p>{{rateCommentForm.status}}</p>
+        </form>
+    </div>
   </div>
   <div [hidden]="dish">
       <i class="fas fa-snowflake fa-spin fa-7x"></i>
