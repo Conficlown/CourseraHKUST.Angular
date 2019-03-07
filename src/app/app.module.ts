@@ -34,6 +34,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import {MatSliderModule} from '@angular/material/slider';
 import { ReactiveFormsModule } from '@angular/forms';
 
+import { HttpClientModule } from '@angular/common/http';
+import { BaseURL } from './shared/baseurl';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -64,12 +67,15 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatToolbarModule,
     FlexLayoutModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   entryComponents: [
     LoginComponent
   ],
-  providers: [DishService, PromotionService],
+  providers: [DishService, 
+    PromotionService,
+    {provide: 'BaseURL', useValue: BaseURL}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
