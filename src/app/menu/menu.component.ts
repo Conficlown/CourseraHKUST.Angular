@@ -59,6 +59,7 @@ export class MenuComponent implements OnInit {
   // dishes = DISHES;
   // dishes: Dish[] = DISHES;
   dishes: Dish[];
+  errMess: string;
 
   // selectedDish = DISHES[0];
   // selectedDish: Dish;
@@ -73,7 +74,8 @@ export class MenuComponent implements OnInit {
   ngOnInit() {
     // this.dishes = this.dishService.getDishes();
     // this.dishService.getDishes().then(dishes => this.dishes = dishes);
-    this.dishService.getDishes().subscribe(dishes => this.dishes = dishes);
+    this.dishService.getDishes()
+      .subscribe(dishes => this.dishes = dishes, errmess => this.errMess = <any>errmess);
   }
 
 }

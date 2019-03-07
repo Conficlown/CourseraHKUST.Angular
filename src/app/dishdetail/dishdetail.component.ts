@@ -21,6 +21,8 @@ export class DishdetailComponent implements OnInit {
 
   @Input()
   dish: Dish;
+  dishcopy: Dish;
+  errMess: string;
 
   dishIds: string[];
   prev: string;
@@ -69,7 +71,7 @@ export class DishdetailComponent implements OnInit {
     this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
     this.route.params
     .pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-    .subscribe( dish => { this.dish = dish; this.setPrevNext(dish.id);});
+    .subscribe( dish => { this.dish = dish; this.dishcopy = dish; this.setPrevNext(dish.id);});
     // this.ratingSetCommentRequired();
     // this.onValueChanged(); // (re)set validation messages now
   }
@@ -107,7 +109,13 @@ export class DishdetailComponent implements OnInit {
   onSubmit() {
     this.rateComment = this.rateCommentForm.value;
     this.rateComment['date'] = this.getToday();
+    // this.dishcopy.comments.push(this.rateComment);
     this.dish.comments.push(this.rateComment);
+    this.dishservice.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish; this.dishcopy = dish;
+      },
+      errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; });
     // console.log(this.rateComment);
     this.rateCommentForm.reset({
       rating: 5,
