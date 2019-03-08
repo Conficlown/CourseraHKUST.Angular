@@ -11,7 +11,7 @@
 
   <!-- <div *ngIf="dish" [routerLink]="['/dishdetail', dish.id]"> -->
     <!-- <p>Display the details of the Dish here</p> -->
-  <div *ngIf="dish"> 
+  <div *ngIf="dish" [@visibility]="visibility" [@expand]> 
     <mat-card fxFlex="40">
       <mat-card-header>
         <mat-card-title>
@@ -43,7 +43,7 @@
           </mat-list-item>
         </mat-list>
     </div>
-    <div fxFlex="40">
+    <div fxFlex="40" [@expand]>
       <!-- <p>Display the list of comments here</p> -->
       <h2>Leave a new comment</h2>
       <mat-list>

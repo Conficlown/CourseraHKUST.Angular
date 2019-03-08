@@ -3,6 +3,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { DishService } from '../services/dish.service';
 import { Dish } from '../shared/dish';
 
+import { flyInOut, expand } from '../animations/app.animation';
+
 
 // import { DISHES } from '../shared/dishes';
 
@@ -53,7 +55,16 @@ import { Dish } from '../shared/dish';
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.scss']
+  styleUrls: ['./menu.component.scss'],
+  // tslint:disable-next-line:use-host-property-decorator
+  host: {
+    '[@flyInOut]': 'true',
+    'style': 'display: block;'
+  },
+  animations: [
+    flyInOut(),
+    expand()
+  ]
 })
 export class MenuComponent implements OnInit {
   // dishes = DISHES;

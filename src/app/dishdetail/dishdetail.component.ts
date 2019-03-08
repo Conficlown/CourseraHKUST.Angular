@@ -1,5 +1,8 @@
 import { Component, OnInit, Input, ViewChild, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+// import { trigger, state, style, animate, transition } from '@angular/animations';
+
+import { visibility, expand } from '../animations/app.animation';
 
 import { Dish } from '../shared/dish';
 
@@ -13,8 +16,13 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-dishdetail',
   templateUrl: './dishdetail.component.html',
-  styleUrls: ['./dishdetail.component.scss']
+  styleUrls: ['./dishdetail.component.scss'],
+  animations: [
+    visibility(),
+    expand()
+  ]
 })
+
 export class DishdetailComponent implements OnInit {
 
   @ViewChild('fform') rateCommentFormDirective;
@@ -23,6 +31,8 @@ export class DishdetailComponent implements OnInit {
   dish: Dish;
   dishcopy: Dish;
   errMess: string;
+
+  visibility = 'shown';
 
   dishIds: string[];
   prev: string;
@@ -70,8 +80,8 @@ export class DishdetailComponent implements OnInit {
 
     this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
     this.route.params
-    .pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-    .subscribe( dish => { this.dish = dish; this.dishcopy = dish; this.setPrevNext(dish.id);});
+    .pipe(switchMap((params: Params) => {this.visibility = 'hidden'; return this.dishservice.getDish(params['id']); } ))
+    .subscribe( dish => { this.dish = dish; this.dishcopy = dish; this.setPrevNext(dish.id); this.visibility = 'shown'; });
     // this.ratingSetCommentRequired();
     // this.onValueChanged(); // (re)set validation messages now
   }
