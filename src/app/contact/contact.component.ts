@@ -1,21 +1,31 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+
+import { AnimationEvent} from '@angular/animations';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
 
-import { flyInOut } from '../animations/app.animation';
+import { FeedbackService } from '../services/feedback.service';
+
+import { expand, showSubmission } from '../animations/app.animation';
 
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.scss'],
-   // tslint:disable-next-line:use-host-property-decorator
-   host: {
-    '[@flyInOut]': 'true',
-    'style': 'display: block;'
+  host: {
+    '[@showSubmission]': 'showSubmission',
+    '(@showSubmission.start)': 'captureStartEvent($event)',
+    '(@showSubmission.done)': 'captureDoneEvent($event)'
   },
+   // tslint:disable-next-line:use-host-property-decorator
+  //  host: {
+  //   '[@showSubmission]': 'true',
+  //   'style': 'display: block;'
+  // },
   animations: [
-    flyInOut()
+    showSubmission(),
+    expand()
   ]
 })
 export class ContactComponent implements OnInit {
@@ -24,7 +34,13 @@ export class ContactComponent implements OnInit {
 
   feedbackForm: FormGroup;
   feedback: Feedback;
+  feedbackCopy: Feedback;
   contactType = ContactType;
+  showSubmission: string;
+  AnimationEnd: boolean;
+
+  errMess: string;
+  submitted: boolean;
 
   formErrors = {
     'firstname': '',
@@ -54,12 +70,17 @@ export class ContactComponent implements OnInit {
     },
   };
 
-  constructor(private fb: FormBuilder) { 
+  constructor(private fb: FormBuilder,
+    private feedbackservice: FeedbackService,
+    @Inject('BaseURL') private BaseURL ) { 
     this.createForm();  
   }
 
   ngOnInit() {
-  }
+    this.submitted = false;
+    this.AnimationEnd = false;
+    this.showSubmission = 'shown';
+ }
 
   createForm(): void {
     this.feedbackForm = this.fb.group({
@@ -79,8 +100,13 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit() {
-    this.feedback = this.feedbackForm.value;
-    console.log(this.feedback);
+    this.feedbackCopy = this.feedbackForm.value;
+    // console.log(this.feedback);
+    this.submitted = true;
+    this.feedbackservice.submitFeedback(this.feedbackCopy).subscribe(
+      feedback => { this.feedback = feedback; this.submitted = false; this.showSubmission='hidden';}, 
+      errmess => { this.feedback = null; this.errMess = <any>errmess; }
+    );
     this.feedbackForm.reset({
       firstname: '',
       lastname: '',
@@ -111,5 +137,18 @@ export class ContactComponent implements OnInit {
         }
       }
     }
+  }
+
+  captureStartEvent(event: AnimationEvent) {
+    // the toState, fromState and totalTime data is accessible from the event variable
+    console.log(event);
+  }
+
+  captureDoneEvent(event: AnimationEvent) {
+    // the toState, fromState and totalTime data is accessible from the event variable
+    if (event.fromState==='shown' && event.toState === 'hidden'){
+      this.AnimationEnd = true;
+    }
+    console.log(event);
   }
 }

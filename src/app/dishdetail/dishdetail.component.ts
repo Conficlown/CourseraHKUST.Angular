@@ -12,6 +12,7 @@ import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { switchMap } from 'rxjs/operators';
+// import { from } from 'rxjs';
 
 @Component({
   selector: 'app-dishdetail',
@@ -134,7 +135,7 @@ export class DishdetailComponent implements OnInit {
     });
     
     // console.log(today.);
-    console.log(this.dish.comments);
+    // console.log(this.dish.comments);
     // this.rateComment.reset();
     // this.rateComment['author'] = '';
     // this.rateComment['comment'] = '';

@@ -36,3 +36,27 @@ export function expand() {
         ])
     ]);
 }
+
+export function showSubmission() {
+    return trigger('showSubmission', [
+        state('hidden', style({
+            opacity: 0
+        })),
+        state('shown', style({
+            opacity: 1
+        })),
+        state('*', style({
+            opacity: 1
+        })),
+        // transition('void => hidden', animate('5s')),
+        transition(':enter', 
+        [
+            style({ opacity:1 })
+        ]),
+        transition('shown=>hidden', 
+        [
+            style({ opacity:1 }),
+            animate('5s ease-out')
+        ])
+    ]);
+}

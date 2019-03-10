@@ -26,8 +26,8 @@
         <p></p>
         <div>
           <a mat-raised-button href="tel:+85212345678"><i class="fa fa-phone"></i> Call</a>
-          <a mat-raised-button><i class="fa fa-skype"></i> Skype</a>
-          <a mat-raised-button href="mailto:confusion@food.net"><i class="fa fa-envelope-o"></i> Email</a>
+          <a mat-raised-button><i class="fab fa-skype"></i> Skype</a>
+          <a mat-raised-button href="mailto:confusion@food.net"><i class="fas fa-envelope"></i> Email</a>
         </div>
         </div>
       <div fxFlex="40">
@@ -40,7 +40,7 @@
       <h3>Send us your Feedback</h3>
       <p>{{ feedbackForm.value | json }} {{ feedbackForm.status | json }}</p>
   
-      <form novalidate [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
+      <form novalidate [formGroup]="feedbackForm"  #fform="ngForm" (ngSubmit)="onSubmit()" *ngIf="!( (feedback || submitted) && !AnimationEnd)">
         <p>
           <mat-form-field class="half-width">
             <input matInput formControlName="firstname" placeholder="First Name" type="text" required>
@@ -82,7 +82,24 @@
             <textarea matInput formControlName="message" placeholder="Your Feedback" rows=12></textarea>
           </mat-form-field>
         </p>
-        <button type="submit" mat-button class="background-primary text-floral-white">Submit</button>
+        <button type="submit" [disabled]="!feedbackForm.valid" mat-button class="background-primary text-floral-white">Submit</button>
       </form>
+    </div>
+
+    <div fxFlex fxFlexOffset="20px" *ngIf="feedback && !AnimationEnd" [@showSubmission]="showSubmission">
+      <h3>Your submission</h3>
+      <h4>First Name: {{feedback.firstname}}</h4>
+      <h4>Last Name: {{feedback.lastname}}</h4>
+      <h4>Tel. Number: {{feedback.telnum}}</h4>
+      <h4>Email: {{feedback.email}}</h4>
+      <h4>Contact you?: {{feedback.agree}}</h4>    
+      <h4>How?: {{feedback.contacttype}}</h4> 
+      <h4>Feedback: {{feedback.message}}</h4>      
+    </div>
+    <!-- <div [hidden]="!submitted"> -->
+    <div *ngIf="submitted"> 
+      <h4>Submitting form</h4>
+      <i class="fas fa-snowflake fa-spin fa-7x"></i>
+      <h4 class="sr-only"> Loading . . . Please Wait</h4>
     </div>
 </div>
